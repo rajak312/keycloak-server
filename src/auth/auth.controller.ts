@@ -2,12 +2,11 @@ import {
   Controller,
   Get,
   Query,
-  Req,
   Res,
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import type { Request, Response } from 'express';
+import type { Response } from 'express';
 import * as crypto from 'crypto';
 
 @Controller('auth')
@@ -84,35 +83,5 @@ export class AuthController {
       );
       throw new UnauthorizedException('Token exchange failed');
     }
-  }
-
-  @Get('me')
-  async me(@Req() req: Request, @Res() res: Response) {
-    const token = req.cookies.KEYCLOAK_ACCESS_TOKEN;
-    if (!token) {
-      throw new UnauthorizedException('Unauthorized');
-    }
-
-    try {
-      const userInfo = await this.authService.getUserInfo(token);
-      return res.json(userInfo);
-    } catch (err) {
-      throw new UnauthorizedException('Invalid token');
-    }
-  }
-
-  @Get('logout')
-  async logout(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = req.cookies.KEYCLOAK_REFRESH_TOKEN;
-
-    res.clearCookie('KEYCLOAK_ACCESS_TOKEN');
-    res.clearCookie('KEYCLOAK_REFRESH_TOKEN');
-    res.clearCookie('KEYCLOAK_ID_TOKEN');
-
-    if (refreshToken) {
-      await this.authService.logout(refreshToken);
-    }
-
-    return res.redirect(this.authService.getFrontendUrl() || '');
   }
 }

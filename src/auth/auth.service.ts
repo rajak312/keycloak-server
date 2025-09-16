@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import * as crypto from 'crypto';
-import * as https from 'https';
+import crypto from 'crypto';
+import https from 'https';
 
 @Injectable()
 export class AuthService {
@@ -64,31 +64,6 @@ export class AuthService {
     });
 
     return response.data;
-  }
-
-  async logout(refreshToken: string) {
-    const logoutUrl = `${this.keycloakUrl}/realms/${this.realm}/protocol/openid-connect/logout`;
-    const agent = new https.Agent({ rejectUnauthorized: false });
-
-    try {
-      await axios.post(
-        logoutUrl,
-        new URLSearchParams({
-          client_id: this.clientId,
-          client_secret: this.clientSecret,
-          refresh_token: refreshToken,
-        }),
-        {
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          httpsAgent: agent,
-        },
-      );
-    } catch (err) {
-      console.error(
-        'Keycloak logout failed:',
-        err.response?.data || err.message,
-      );
-    }
   }
 
   getFrontendUrl() {
