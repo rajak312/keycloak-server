@@ -1,7 +1,7 @@
-import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Controller, Get, Req } from '@nestjs/common';
 import { Authenticate } from 'src/decorators/authenticate.decorator';
 import { User } from 'src/decorators/user.decorator';
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { UserService } from './user.service';
 
 @Authenticate()
@@ -20,29 +20,9 @@ export class UserController {
   }
 
   @Get('logout')
-  async logout(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = req.cookies.KEYCLOAK_REFRESH_TOKEN;
-    res.clearCookie('KEYCLOAK_ACCESS_TOKEN', {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-    });
-    res.clearCookie('KEYCLOAK_REFRESH_TOKEN', {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-    });
-    res.clearCookie('KEYCLOAK_ID_TOKEN', {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-    });
-
-    if (refreshToken) {
-      await this.userService.logout(refreshToken);
-    }
-    return res.json({
-      message: 'user logout successfully',
-    });
+  async logout(@Req() req: Request) {
+    const refreshToken = req.headers['x-refresh-token'] as string;
+    const response = await this.userService.logout(refreshToken || '');
+    return response;
   }
 }

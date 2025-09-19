@@ -30,11 +30,13 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    const token = req.cookies?.KEYCLOAK_ACCESS_TOKEN;
 
-    if (!token) {
-      throw new UnauthorizedException('No access token found');
+    const authHeader = req.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedException('No access token provided');
     }
+
+    const token = authHeader.split(' ')[1];
 
     try {
       const decoded = await new Promise<JwtPayload>((resolve, reject) => {

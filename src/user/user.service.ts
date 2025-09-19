@@ -26,11 +26,12 @@ export class UserService {
           httpsAgent: agent,
         },
       );
+      return { message: 'User logged out successfully' };
     } catch (err) {
-      console.error(
-        'Keycloak logout failed:',
-        err.response?.data || err.message,
-      );
+      return {
+        message: 'Keycloak logout failed',
+        error: err.response?.data || err.message,
+      };
     }
   }
 }
