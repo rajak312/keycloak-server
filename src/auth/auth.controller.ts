@@ -15,22 +15,10 @@ export class AuthController {
   async token(@Body() body: TokenRequestDto) {
     const { code, codeVerifier, redirectUri } = body;
 
-    if (!code || !codeVerifier || !redirectUri) {
-      throw new UnauthorizedException('Missing required parameters');
-    }
-
-    try {
-      return await this.authService.exchangeCodeForToken(
-        code,
-        codeVerifier,
-        redirectUri,
-      );
-    } catch (err) {
-      console.error(
-        'Token exchange failed:',
-        err.response?.data || err.message,
-      );
-      throw new UnauthorizedException('Token exchange failed');
-    }
+    return await this.authService.exchangeCodeForToken(
+      code,
+      codeVerifier,
+      redirectUri,
+    );
   }
 }
